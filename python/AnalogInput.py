@@ -58,15 +58,17 @@ class AI_Graph(AnalysisWithFigure):
     data = Member()
     samples_to_draw_start=Typed(IntProp)
     samples_to_draw_end=Typed(IntProp)
+    sample_rate=Typed(IntProp)
     update_lock = Bool(False)
     list_of_what_to_plot = Str()  # a list of tuples of [(channel, samples_list), (channel, samples_list)] where samples in samples_list will be averaged over
 
     def __init__(self, name, experiment, description=''):
         super(AI_Graph, self).__init__(name, experiment, description)
-        self.properties += ['version', 'enable', 'list_of_what_to_plot','enable_singlecycle','samples_to_draw_start','samples_to_draw_end']
+        self.properties += ['version', 'enable', 'list_of_what_to_plot','enable_singlecycle','samples_to_draw_start','samples_to_draw_end','sample_rate']
         self.data = None
         self.samples_to_draw_start=IntProp('First sample to draw',experiment,'sample num','0')
-        self.samples_to_draw_end=IntProp('Last sample to draw',experiment,'sample num','samples_per_measurement')
+        self.samples_to_draw_end=IntProp('Last sample to draw',experiment,'sample num','0')
+        self.sample_rate=IntProp('AI sampler rate',experiment,'S/s','0')
 
     def analyzeMeasurement(self, measurementResults, iterationResults, experimentResults):
         if self.enable and ('data/AI' in measurementResults):
@@ -105,6 +107,7 @@ class AI_Graph(AnalysisWithFigure):
                         ax = fig.add_subplot(111)
                         if (self.enable_singlecycle==True):
                             reduced_plotlist=[]
+                            x_time=numpy.linspace(1000*self.samples_to_draw_start.value/self.sample_rate.value,1000*self.samples_to_draw_end.value/self.sample_rate.value,self.samples_to_draw_end.value-self.samples_to_draw_start.value)
                             for i in plotlist:
                                 reduced_plotlist.append((i,range(self.samples_to_draw_start.value,self.samples_to_draw_end.value)))
                             for i in reduced_plotlist:
@@ -114,7 +117,9 @@ class AI_Graph(AnalysisWithFigure):
                                     logger.warning('Trying to plot data that does not exist in AIGraph: channel {} samples {}-{}'.format(i[0], min(i[1]), max(i[1])))
                                     continue
                                 label = 'ch.{}'.format(i[0])
-                                ax.plot(data, 'o', label=label)
+                                ax.plot(x_time,data, '--', label=label)
+                            ax.set_ylabel('V')
+                            ax.set_xlabel('ms')
                             ax.legend()
                         else:
                             for i in plotlist:

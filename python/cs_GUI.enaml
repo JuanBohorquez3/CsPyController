@@ -2150,6 +2150,8 @@ enamldef AnalogInputGraph(Window):
                             prop << analysis.samples_to_draw_start
                         EvalProp:
                             prop << analysis.samples_to_draw_end
+                        EvalProp:
+                            prop << analysis.sample_rate
                         Label:
                             text = 'specify what to graph with a list of tuples: [(channel,samples_list),(channel, samples_list)...]\nSamples in samples_list will be averaged.'
                         Field:
