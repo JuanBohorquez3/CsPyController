@@ -95,7 +95,6 @@ class AndorCamera(Instrument):
     status = Str()
     accumulate = Float()
     kinetic = Float()
-
     num_cameras = c_long()
     cameraHandleList = Member()
     cameraHandleDict = Member()

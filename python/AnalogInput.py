@@ -54,14 +54,19 @@ class AI_Graph(AnalysisWithFigure):
     """Plots a region of interest sum after every measurement"""
     version = '2014.10.13'
     enable = Bool()
+    enable_singlecycle=Bool()
     data = Member()
+    samples_to_draw_start=Typed(IntProp)
+    samples_to_draw_end=Typed(IntProp)
     update_lock = Bool(False)
     list_of_what_to_plot = Str()  # a list of tuples of [(channel, samples_list), (channel, samples_list)] where samples in samples_list will be averaged over
 
     def __init__(self, name, experiment, description=''):
         super(AI_Graph, self).__init__(name, experiment, description)
-        self.properties += ['version', 'enable', 'list_of_what_to_plot']
+        self.properties += ['version', 'enable', 'list_of_what_to_plot','enable_singlecycle','samples_to_draw_start','samples_to_draw_end']
         self.data = None
+        self.samples_to_draw_start=IntProp('First sample to draw',experiment,'sample num','0')
+        self.samples_to_draw_end=IntProp('Last sample to draw',experiment,'sample num','samples_per_measurement')
 
     def analyzeMeasurement(self, measurementResults, iterationResults, experimentResults):
         if self.enable and ('data/AI' in measurementResults):
@@ -98,17 +103,30 @@ class AI_Graph(AnalysisWithFigure):
                             return
                         #make one plot
                         ax = fig.add_subplot(111)
-                        for i in plotlist:
-                            try:
-                                #data = numpy.average(self.data[:, i[0], i[1]], axis=1)  # All measurements. Selected channel, saverage over sampels.
-                                data=self.data[-1, i[0], i[1]] # Show only the latest
-                            except:
-                                logger.warning('Trying to plot data that does not exist in AIGraph: channel {} samples {}-{}'.format(i[0], min(i[1]), max(i[1])))
-                                continue
-                            label = 'ch.{}'.format(i[0])
-                            ax.plot(data, 'o', label=label)
-                        #add legend using the labels assigned during ax.plot()
-                        ax.legend()
+                        if (self.enable_singlecycle==True):
+                            reduced_plotlist=[]
+                            for i in plotlist:
+                                reduced_plotlist.append((i,range(self.samples_to_draw_start.value,self.samples_to_draw_end.value)))
+                            for i in reduced_plotlist:
+                                try:
+                                    data=self.data[-1, i[0], i[1]] # Show only the latest
+                                except:
+                                    logger.warning('Trying to plot data that does not exist in AIGraph: channel {} samples {}-{}'.format(i[0], min(i[1]), max(i[1])))
+                                    continue
+                                label = 'ch.{}'.format(i[0])
+                                ax.plot(data, 'o', label=label)
+                            ax.legend()
+                        else:
+                            for i in plotlist:
+                                try:
+                                    data = numpy.average(self.data[:, i[0], i[1]], axis=1)  # All measurements. Selected channel, saverage over sampels.
+                                except:
+                                    logger.warning('Trying to plot data that does not exist in AIGraph: channel {} samples {}-{}'.format(i[0], min(i[1]), max(i[1])))
+                                    continue
+                                label = 'ch.{}'.format(i[0])
+                                ax.plot(data, 'o', label=label)
+                            #add legend using the labels assigned during ax.plot()
+                            ax.legend()
                     super(AI_Graph, self).updateFigure()
                 except Exception as e:
                     logger.warning('Problem in AIGraph.updateFigure()\n:{}'.format(e))

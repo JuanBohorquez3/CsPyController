@@ -2122,6 +2122,14 @@ enamldef AnalogInput(Window):
                         CheckBox:
                             checked := analysis.draw_fig
                         Label:
+                            text='single cycle'
+                        CheckBox:
+                            checked:=analysis.enable_singlecycle
+                        EvalProp:
+                            prop << analysis.samples_to_draw_start
+                        EvalProp:
+                            prop << analysis.samples_to_draw_end
+                        Label:
                             text = 'specify what to graph with a list of tuples: [(channel,samples_list),(channel, samples_list)...]\nSamples in samples_list will be averaged.'
                         Field:
                             text := analysis.list_of_what_to_plot

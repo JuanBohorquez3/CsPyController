@@ -1443,7 +1443,7 @@ class RetentionAnalysis(Analysis):
     def analyzeIteration(self, iterationResults, experimentResults):
         if self.enable:
             if self.roi_type == 0:  # square roi
-                cutoffs = self.experiment.thresholdROIAnalysis.threshold_array['1']                
+                cutoffs = self.experiment.thresholdROIAnalysis.threshold_array['1'] # Grab cutoffs for single atom
                 ROI_sums = iterationResults['analysis/square_roi/sums'].value
             elif self.roi_type == 1:  # gaussian roi
                 cutoffs = self.experiment.gaussian_roi.cutoffs
@@ -1465,7 +1465,7 @@ class RetentionAnalysis(Analysis):
 
             self.set_gui({'text': text})
 
-    def retention(self, cutoffs, ROI_sums, rows=7, columns=7):
+    def retention(self, cutoffs, ROI_sums, rows=1, columns=1):
         # cutoffs has shape (rois)
         # ROI_sums has shape (measurements, shots, rois)
 
@@ -1479,9 +1479,9 @@ class RetentionAnalysis(Analysis):
         retained = numpy.sum(numpy.logical_and(atoms[:, 0, :], atoms[:, 1, :]), axis=0)
         # find the number of reloaded atoms
         reloaded = numpy.sum(numpy.logical_and(numpy.logical_not(atoms[:, 0, :]), atoms[:, 1, :]), axis=0)
-
         loading = loaded/total
         retention = retained/loaded
+
         # find the 1 sigma confidence interval for binomial data using the normal approximation:
         # http://en.wikipedia.org/wiki/Binomial_proportion_confidence_interval
         retention_sigma = numpy.sqrt(retention*(1-retention)/loaded)

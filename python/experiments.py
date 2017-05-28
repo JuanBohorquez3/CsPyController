@@ -713,7 +713,7 @@ class Experiment(Prop):
         """Enables all instruments to begin a measurement.  Sent at the beginning of every measurement.
         Actual output or input from the measurement may yet wait for a signal from another device."""
 
-        logger.debug('starting measurement')
+        logger.info('starting measurement')
         start_time = time.time()  # record start time of measurement
         self.timeOutExpired = False
 
@@ -801,8 +801,8 @@ class Experiment(Prop):
             a = i.postMeasurement(self.measurementResults, self.iterationResults, self.hdf5)
             time2_debug=1000.0*(time.time()-time_debug)
             # To measure how long do analyses take.
-            #if (time2_debug>0.5): # Don't display if the process takes less than 0.5 ms
-            #    logger.info('Running :{0}, time usage : {1}ms'.format(i,round(time2_debug,0)))
+            if (time2_debug>0.5): # Don't display if the process takes less than 0.5 ms
+                logger.info('Running :{0}, time usage : {1}ms'.format(i,round(time2_debug,0)))
 
             if (a is None) or (a == 0):
                 continue
