@@ -59,16 +59,21 @@ class AI_Graph(AnalysisWithFigure):
     samples_to_draw_start=Typed(IntProp)
     samples_to_draw_end=Typed(IntProp)
     sample_rate=Typed(IntProp)
+    plot_ylimit1=Typed(FloatProp)
+    plot_ylimit2=Typed(FloatProp)
+
     update_lock = Bool(False)
     list_of_what_to_plot = Str()  # a list of tuples of [(channel, samples_list), (channel, samples_list)] where samples in samples_list will be averaged over
 
     def __init__(self, name, experiment, description=''):
         super(AI_Graph, self).__init__(name, experiment, description)
-        self.properties += ['version', 'enable', 'list_of_what_to_plot','enable_singlecycle','samples_to_draw_start','samples_to_draw_end','sample_rate']
+        self.properties += ['version', 'enable', 'list_of_what_to_plot','enable_singlecycle','samples_to_draw_start','samples_to_draw_end','sample_rate','plot_ylimit1','plot_ylimit2']
         self.data = None
         self.samples_to_draw_start=IntProp('First sample to draw',experiment,'sample num','0')
         self.samples_to_draw_end=IntProp('Last sample to draw',experiment,'sample num','0')
-        self.sample_rate=IntProp('AI sampler rate',experiment,'S/s','0')
+        self.sample_rate=IntProp('AI sample rate',experiment,'S/s','0')
+        self.plot_ylimit1=FloatProp('y axis limit1',experiment,'V','-5')
+        self.plot_ylimit2=FloatProp('y axis limit2',experiment,'V','5')
 
     def analyzeMeasurement(self, measurementResults, iterationResults, experimentResults):
         if self.enable and ('data/AI' in measurementResults):
@@ -77,7 +82,11 @@ class AI_Graph(AnalysisWithFigure):
             if self.data is None:
                 self.data = numpy.array([d])
             else:
-                self.data = numpy.append(self.data, numpy.array([d]), axis=0)
+                if self.data.shape[1:]==numpy.array([d]).shape[1:]:
+                    # If the shape of newly acquired data is different from before, build new array from new one. This happens when acquisition resource is changed or sample rate change.
+                    self.data = numpy.append(self.data, numpy.array([d]), axis=0)
+                else:
+                    self.data = numpy.array([d])
             self.updateFigure()
 
     @observe('list_of_what_to_plot')
@@ -120,7 +129,11 @@ class AI_Graph(AnalysisWithFigure):
                                 ax.plot(x_time,data, '--', label=label)
                             ax.set_ylabel('V')
                             ax.set_xlabel('ms')
-                            ax.legend()
+                            ymin=min(self.plot_ylimit1.value,self.plot_ylimit2.value)
+                            ymax=max(self.plot_ylimit1.value,self.plot_ylimit2.value)
+                            ax.set_xlim(min(x_time),max(x_time))
+                            ax.set_ylim(ymin,ymax)
+                            ax.legend(bbox_to_anchor=(1,1))
                         else:
                             for i in plotlist:
                                 try:
