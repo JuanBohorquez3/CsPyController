@@ -126,7 +126,7 @@ class AI_Graph(AnalysisWithFigure):
                                     logger.warning('Trying to plot data that does not exist in AIGraph: channel {} samples {}-{}'.format(i[0], min(i[1]), max(i[1])))
                                     continue
                                 label = 'ch.{}'.format(i[0])
-                                ax.plot(x_time,data, '--', label=label)
+                                ax.plot(x_time,data, label=label)
                             ax.set_ylabel('V')
                             ax.set_xlabel('ms')
                             ymin=min(self.plot_ylimit1.value,self.plot_ylimit2.value)
