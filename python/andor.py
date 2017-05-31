@@ -38,7 +38,7 @@ from cs_instruments import Instrument
 from analysis import AnalysisWithFigure, Analysis
 from colors import my_cmap
 from enaml.application import deferred_call
-
+import threading
 # get the config file
 from __init__ import import_config
 config = import_config()
@@ -1106,7 +1106,6 @@ class AndorViewer(AnalysisWithFigure):
 
     maxPixel = Int(0)
     meanPixel = Int(0)
-
     def __init__(self, name, experiment, description,camera):
         super(AndorViewer, self).__init__(name, experiment, description)
         self.properties += ['shot', 'bgsub']
@@ -1119,6 +1118,7 @@ class AndorViewer(AnalysisWithFigure):
             #for each image
             self.data = measurementResults['data/Andor_{0}/shots/{1}'.format(self.mycam.CurrentHandle,self.shot)]
             #print measurementResults['data/Andor_{0}/shots/{1}'.format(self.mycam.CurrentHandle,self.shot)]
+
         self.updateFigure()  # only update figure if image was loaded
 
     @observe('shot')

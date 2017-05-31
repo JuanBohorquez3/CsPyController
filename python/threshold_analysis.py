@@ -5,7 +5,6 @@ from atom.api import Bool, Str, Member, Int, observe
 from analysis import AnalysisWithFigure
 
 from colors import my_cmap, green_cmap
-
 # get the config file
 from __init__ import import_config
 config = import_config()
@@ -25,7 +24,7 @@ class ThresholdROIAnalysis(AnalysisWithFigure):
     loading_array = Member()
     meas_analysis_path = Member()
     enable = Bool()
-
+    
     def __init__(self, experiment, roi_rows=1, roi_columns=1):
         super(ThresholdROIAnalysis, self).__init__('ThresholdROIAnalysis', experiment, 'Simple threshold digitization')
         self.loading_array = np.zeros((0, roi_rows, roi_columns), dtype=np.bool_)

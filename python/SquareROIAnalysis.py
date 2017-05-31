@@ -19,7 +19,6 @@ import numpy as np
 from atom.api import Bool, Str, Member, Int
 
 from analysis import AnalysisWithFigure
-
 logger = logging.getLogger(__name__)
 
 # get the config file
@@ -63,7 +62,7 @@ class SquareROIAnalysis(AnalysisWithFigure):
     shots_path = Member()
     meas_analysis_path = Member()
     iter_analysis_path = Member()
-
+    
     def __init__(self, experiment, roi_rows=1, roi_columns=1, roi_bg_rows=0, roi_bg_columns=0):
         super(SquareROIAnalysis, self).__init__(
             'SquareROIAnalysis',
@@ -150,7 +149,8 @@ class SquareROIAnalysis(AnalysisWithFigure):
 
                 self.sum_array = sum_array.reshape((num_shots, self.ROI_rows, self.ROI_columns))
                 measurementResults[self.meas_analysis_path] = sum_array
-                self.updateFigure()
+
+                self.updateFigure()  # only update figure if image was loaded
 
             # check to see if there were supposed to be images
             elif self.camera.enable and (self.camera.shotsPerMeasurement.value > 0):
