@@ -35,8 +35,4 @@ class Vitalsign(Analysis):
             threshold_array=measurementResults[self.meas_analysis_path][()]
             threshold_array.astype(int)
             if np.sum(threshold_array)>0:
-                winsound.Beep(2000,100)        
-
-
-    def analyzeIteration(self, iterationResults, experimentResults):
-        pass
+                winsound.Beep(2000,200)
