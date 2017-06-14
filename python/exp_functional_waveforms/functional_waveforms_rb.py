@@ -419,6 +419,13 @@ class Rb(object):
             profiles=ryd780a_aom_switch_profile,
             delay=ryd780a_aom_switch_delay
         )
+
+        self.ground_aom_switch = Switch(
+            HSDIO,
+            ground_aom_switch_chan,
+            profiles=ground_aom_switch_profile,
+            delay=ground_aom_switch_delay
+        )
 #    def mot_dds(self):
 #        return
 #
